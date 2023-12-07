@@ -7,17 +7,9 @@ class VectorUtils:
     def product_quantization(vector: list, num_subvectors: int, num_bits: int) -> list:
         quantized_vector = []
         for subvector in np.array_split(vector, num_subvectors):
-            quantized_value = VectorUtils._quantize(subvector, num_bits)
+            quantized_value = int(round(np.average(subvector)))
             quantized_vector.append(quantized_value)
-            
-    @staticmethod
-    def _quantize(vector: list, num_bits: int) -> int:
-        max_value = max(vector)
-        min_value = min(vector)
-        range_value = max_value - min_value
-        step = range_value / (2 ** num_bits)
-        quantized_value = int((np.average(vector) - min_value) / step)
-        return quantized_value
+        return quantized_vector
     
     
-print(VectorUtils._quantize([4,5,6] ,2))
+print(VectorUtils.product_quantization([19,12,1,4,5,6,7,8], 4, 2))
