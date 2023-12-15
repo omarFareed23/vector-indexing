@@ -21,6 +21,7 @@ class VecDB:
     def save_clusters(self, rows, labels, centroids):
         files = [open(f"./{self.file_path}/cluster_{i}", "a") for i in range(len(centroids))]
         centroid_file_path = f"./{self.file_path}/centroids"
+        print('before writing')
         for i in range(len(rows)):
             _id = self.mp[tuple(rows[i])]
             files[labels[i]].write(f"{_id},{self.string_rep(rows[i])}\n")
@@ -33,16 +34,25 @@ class VecDB:
         return int(np.ceil(rows_count / np.sqrt(rows_count)) * 3)
 
     def cluster_data(self, rows):
-        self.mp = {tuple(row["embed"]): row["id"] for row in rows}
-        print(self.num_clusters(len(rows)))
-        rows = [row["embed"] for row in rows]
+        if type(rows[0]) == dict:
+            self.mp = {tuple(row["embed"]): row["id"] for row in rows}
+            print(self.num_clusters(len(rows)))
+            rows = [row["embed"] for row in rows]
+        else:
+            print('before mp')
+            self.mp = {tuple(row): i for i, row in enumerate(rows)}
+
+        print('begin clustering')
         kmeans = KMeans(
             n_clusters=self.num_clusters(len(rows)), n_init=1, verbose=True,
             batch_size=int(1e5)
         ).fit(rows)
+        print('after clustering')
         labels = kmeans.predict(rows)
         centroids = list(map(self.string_rep, kmeans.cluster_centers_))
+        print('before save clusters')
         self.save_clusters(rows, labels, centroids)
+            
 
     def insert_records(self, rows):
         self.cluster_data(rows)
