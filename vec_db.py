@@ -13,10 +13,6 @@ class VecDB:
         if not os.path.exists(f"./{file_path}"):
             os.mkdir(f"./{file_path}")
         self.file_path = file_path
-        if new_db:
-            # just open new file to delete the old one
-            with open(self.file_path, "w") as fout:
-                pass
                 
 
     def string_rep(self, vec):
