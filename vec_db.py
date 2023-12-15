@@ -9,24 +9,20 @@ from sklearn.cluster import MiniBatchKMeans as KMeans
 
 
 class VecDB:
-    def __init__(self, file_path="saved_db.csv", new_db=True) -> None:
-        shutil.rmtree("./db") if os.path.exists("./db") else None
-        os.mkdir("./db")
+    def __init__(self, file_path="saved_db", new_db=True) -> None:
         self.file_path = file_path
-        self.num_per_cluster = 1000
-        self.top_level = 0
         if new_db:
             # just open new file to delete the old one
             with open(self.file_path, "w") as fout:
-                # if you need to add any head to the file
                 pass
+                
 
     def string_rep(self, vec):
         return ",".join([str(e) for e in vec])
 
     def save_clusters(self, rows, labels, centroids):
-        files = [open(f"./db/cluster_{i}", "a") for i in range(len(centroids))]
-        centroid_file_path = "./db/centroids"
+        files = [open(f"./db/{self.file_path}/cluster_{i}", "a") for i in range(len(centroids))]
+        centroid_file_path = f"./db/{self.file_path}/centroids"
         for i in range(len(rows)):
             _id = self.mp[tuple(rows[i])]
             files[labels[i]].write(f"{_id},{self.string_rep(rows[i])}\n")
@@ -56,7 +52,7 @@ class VecDB:
     def retrive(self, query, top_k=5):
         clusters = []
         data = []
-        with open("./db/centroids", "r") as fin:
+        with open(f"./db/{self.file_path}/centroids", "r") as fin:
             clusters.extend(
                 np.array(list(map(float, line.split(",")))) for line in fin.readlines()
             )
@@ -67,7 +63,7 @@ class VecDB:
                 ],
                 reverse=True,
             )
-            top_m_clusters = [open(f"./db/cluster_{i}", "r") for _, i in scores[:15]]
+            top_m_clusters = [open(f"./db/{self.file_path}/cluster_{i}", "r") for _, i in scores[:15]]
             data = []
             for f in top_m_clusters:
                 data.extend(
