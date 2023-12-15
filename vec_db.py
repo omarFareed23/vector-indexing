@@ -10,6 +10,10 @@ from sklearn.cluster import MiniBatchKMeans as KMeans
 
 class VecDB:
     def __init__(self, file_path="saved_db", new_db=True) -> None:
+        if not os.path.exists("./db"):
+            os.mkdir("./db")
+        if not os.path.exists(f"./db/{file_path}"):
+            os.mkdir(f"./db/{file_path}")
         self.file_path = file_path
         if new_db:
             # just open new file to delete the old one
@@ -21,7 +25,7 @@ class VecDB:
         return ",".join([str(e) for e in vec])
 
     def save_clusters(self, rows, labels, centroids):
-        files = [open(f"./db/{self.file_path}/cluster_{i}", "a") for i in range(len(centroids))]
+        files = [open(f"./db/{self.file_path}/cluster_{i}", "wa") for i in range(len(centroids))]
         centroid_file_path = f"./db/{self.file_path}/centroids"
         for i in range(len(rows)):
             _id = self.mp[tuple(rows[i])]
