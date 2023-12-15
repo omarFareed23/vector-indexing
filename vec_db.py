@@ -23,7 +23,7 @@ class VecDB:
         centroid_file_path = f"./{self.file_path}/centroids"
         print('before writing')
         for i in range(len(rows)):
-            _id = self.mp[tuple(rows[i])]
+            _id = self.mp[self.str_rep2_vec(rows[i])]
             files[labels[i]].write(f"{_id},{self.string_rep(rows[i])}\n")
         [f.close() for f in files]
         with open(centroid_file_path, "a") as fout:
@@ -33,6 +33,8 @@ class VecDB:
     def num_clusters(self, rows_count):
         return int(np.ceil(rows_count / np.sqrt(rows_count)) * 3)
 
+    def str_rep2_vec(self, vec):
+        return "".join(str(int(e * 10)) for e in vec)
     def cluster_data(self, rows):
         if type(rows[0]) == dict:
             self.mp = {tuple(row["embed"]): row["id"] for row in rows}
@@ -40,7 +42,7 @@ class VecDB:
             rows = [row["embed"] for row in rows]
         else:
             print('before mp')
-            self.mp = {tuple(row): i for i, row in enumerate(rows)}
+            self.mp = {self.str_rep2_vec(row): i for i, row in enumerate(rows)}
 
         print('begin clustering')
         kmeans = KMeans(
