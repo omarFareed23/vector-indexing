@@ -37,7 +37,7 @@ class VecDB:
         return "".join(str(int(e * 10)) for e in vec)
     def cluster_data(self, rows):
         if type(rows[0]) == dict:
-            self.mp = {tuple(row["embed"]): row["id"] for row in rows}
+            self.mp = {self.str_rep2_vec(row["embed"]): row["id"] for row in rows}
             print(self.num_clusters(len(rows)))
             rows = [row["embed"] for row in rows]
         else:
